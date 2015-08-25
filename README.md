@@ -64,7 +64,7 @@ Code Example:
     for (coll in res[["collections"]]) {
         print(coll)
     }
-    for (dataObj in res[[dataObjects"]]) {
+    for (dataObj in res[["dataObjects"]]) {
         print(dataObj)
     }
 
