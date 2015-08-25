@@ -7,8 +7,8 @@ The R iRODS client API uses the REST API for communications with iRODS.  See [iR
 ## Including the API Code and Creating a Connection Context
 The first steps to use the API is to import the iRODS_API.R file and create an connection context object.  This is done as follows:
 
-> source("/path/to/source/file/iRODS_API.R")
-> context <- IrodsContext("localhost", "8080", "rods", "rods")
+    source("/path/to/source/file/iRODS_API.R")
+    context <- IrodsContext("localhost", "8080", "rods", "rods")
 
 The arguments to the IrodsContext constructor are:
 * irods_server - the hostname or address of the iRODS server 
@@ -16,7 +16,7 @@ The arguments to the IrodsContext constructor are:
 * username - the iRODS user that is used for the connection to iRODS
 * password - the password for the iRODS user  
 
-** Note that the REST API Port is the port to connect to the REST API web service.  This is NOT the port to connect to the iCAT server. **
+> Note that the REST API Port is the port to connect to the REST API web service.  This is NOT the port to connect to the iCAT server. 
 
 ## Operations and Code Samples
 
@@ -33,8 +33,8 @@ Arguments:
 
 Code Example:
 
-> res <- context$getDataObjectContents("/tempZone/home/rods/a.txt, FALSE)
-> print(res)
+    res <- context$getDataObjectContents("/tempZone/home/rods/a.txt, FALSE)
+    print(res)
 
 ### putDataObject
 
@@ -47,7 +47,7 @@ Arguments:
 
 Code Example:
 
-> context$putDataObject("/home/jjames/tmp.txt", "/tempZone/home/rods/tmp.txt")
+    context$putDataObject("/home/jjames/tmp.txt", "/tempZone/home/rods/tmp.txt")
 
 ### listCollection
 
@@ -60,13 +60,13 @@ Arguments:
 
 Code Example:
 
->  context$listCollection("/tempZone/home/rods")
->  for (coll in res[["collections"]]) {
->      print(coll)
->  }
->  for (dataObj in res[[dataObjects"]]) {
->      print(dataObj)
->  }
+    context$listCollection("/tempZone/home/rods")
+    for (coll in res[["collections"]]) {
+        print(coll)
+    }
+    for (dataObj in res[[dataObjects"]]) {
+        print(dataObj)
+    }
 
 ### putCollection
 
@@ -78,7 +78,7 @@ Arguments:
 
 Code Example:
 
-> context$putCollection("/tempZone/home/rods/temp")
+    context$putCollection("/tempZone/home/rods/temp")
 
 ### rmCollection
 
@@ -91,7 +91,7 @@ Arguments:
 
 Code Example:
 
-> context$rmCollection("/tempZone/home/rods/temp")
+    context$rmCollection("/tempZone/home/rods/temp")
 
 ### getCollectionMetadata
 
@@ -105,12 +105,12 @@ Arguments:
 
 Code Example:
 
-> meta <- context$getCollectionMetadata("/tempZone/home/rods")
-> for (row in meta) {
->     print (row$attr)
->     print(row$val)
->     print(row$unit)
-> }
+    meta <- context$getCollectionMetadata("/tempZone/home/rods")
+    for (row in meta) {
+        print (row$attr)
+        print(row$val)
+        print(row$unit)
+    }
 
 
 ### getDataObjectMetadata
@@ -125,12 +125,12 @@ Arguments:
 
 Code Example:
 
-> meta <- context$getDataObjectMetadata("/tempZone/home/rods/myfile.txt")
-> for (row in meta) {
->      print(row$attr)
->      print(row$val)
->      print(row$unit)
->  }
+    meta <- context$getDataObjectMetadata("/tempZone/home/rods/myfile.txt")
+    for (row in meta) {
+        print(row$attr)
+        print(row$val)
+        print(row$unit)
+    }
 
 ### addDataObjectMetadata
 
@@ -143,10 +143,10 @@ Arguments:
 
 Code Example:
 
-> avu_list <- list()
-> avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
-> avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
-> context$addDataObjectMetadata("/tempZone/home/rods/tmp.txt", avu_list)
+     avu_list <- list()
+     avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
+     avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
+     context$addDataObjectMetadata("/tempZone/home/rods/tmp.txt", avu_list)
 
 ### deleteDataObjectMetadata
 
@@ -159,10 +159,10 @@ Arguments:
 
 Code Example:
 
-> avu_list <- list()
-> avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
-> avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
-> context$deleteDataObjectMetadata("/tempZone/home/rods/tmp.txt", avu_list)
+    avu_list <- list()
+    avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
+    avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
+    context$deleteDataObjectMetadata("/tempZone/home/rods/tmp.txt", avu_list)
 
 ### addCollectionMetadata
 
@@ -175,10 +175,10 @@ Arguments:
 
 Code Example:
 
-> avu_list <- list()
-> avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
-> avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
-> context$addCollectionMetadata("/tempZone/home/rods", avu_list)
+    avu_list <- list()
+    avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
+    avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
+    context$addCollectionMetadata("/tempZone/home/rods", avu_list)
 
 ### deleteCollectionMetadata
 
@@ -191,8 +191,8 @@ Arguments:
 
 Code Example:
 
-> avu_list <- list()
-> avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
-> avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
-> context$deleteCollectionMetadata("/tempZone/home/rods", avu_list)
+    avu_list <- list()
+    avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
+    avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
+    context$deleteCollectionMetadata("/tempZone/home/rods", avu_list)
  
