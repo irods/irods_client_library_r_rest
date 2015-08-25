@@ -4,12 +4,12 @@ library(XML)
 # Sets up a context for a connection to the iRODS REST service..
 #
 # Args:
-#  irods_server:         The hostname or address of the iRODS server. 
-#  irods_rest_api_port:  The port to connect to the iRODS REST API. 
+#  irods_server:         The hostname or address of the iRODS server.
+#  irods_rest_api_port:  The port to connect to the iRODS REST API.
 #  username:             The iRODS user that is used for the connection to iRODS.
 #  password:             The password for the iRODS user.
-# 
-# Returns: 
+#
+# Returns:
 #    A context object that can be used to execute further interactions with iRODS.
 #
 # Example of creating and using a context.
@@ -20,7 +20,7 @@ library(XML)
 IrodsContext <- function(irods_server, irods_rest_api_port, username, password) {
 
    thisEnv <- environment()
-   
+
    .irods_server <- irods_server
    .irods_rest_api_port <- irods_rest_api_port
    .username <- username
@@ -28,18 +28,18 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
 
     me <- list(
         thisEnv = thisEnv,
-        
-        # Gets the URL prefix for the REST calls. 
+
+        # Gets the URL prefix for the REST calls.
         getRestUrlPrefix = function() {
             rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
             rest_url_prefix <- paste(rest_url_prefix, "@", get(".irods_server"), ":", sep="")
-            rest_url_prefix <- paste(rest_url_prefix, get(".irods_rest_api_port"), "/irods-rest/rest", sep="") 
+            rest_url_prefix <- paste(rest_url_prefix, get(".irods_rest_api_port"), "/irods-rest/rest", sep="")
             return(rest_url_prefix)
         },
 
         # Gets and authentication object with the supplied username and password.
         getAuthenticationObj = function() {
-            authenticate(get(".username"), get(".password"))    
+            authenticate(get(".username"), get(".password"))
         },
 
 
@@ -48,9 +48,9 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         # Args:
         #  path:    The path of the data object.
         #  binary:  Boolean to indicate whether the return value is a vector
-        #           of hex numbers (TRUE) or a character vector (FALSE). 
-        # 
-        # Returns: 
+        #           of hex numbers (TRUE) or a character vector (FALSE).
+        #
+        # Returns:
         #   The contents of the data object as either a vector of hex numbers
         #   or a character vector.
         #
@@ -63,15 +63,15 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
             authObj <- get("this")$getAuthenticationObj()
 
             res <- GET(irods_rest_url, authObj)
-            
-            # check for error 
+
+            # check for error
             stop_for_status(res)
- 
+
             # return content
-           
+
             if (binary == TRUE) {
                 content(res, "raw")
-            } else { 
+            } else {
                 content(res, "text")
             }
 
@@ -80,34 +80,34 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         # Puts a file into iRODS.
         #
         # Args:
-        #  sourcePath:  The path on the OS for the file to be placed into iRODS. 
-        #  irodsPath:   The destination to place the data object into iRODS. 
-        # 
-        # Returns: 
+        #  sourcePath:  The path on the OS for the file to be placed into iRODS.
+        #  irodsPath:   The destination to place the data object into iRODS.
+        #
+        # Returns:
         #  None
         #
         # Exception Handling:
         #   An error is returned when the REST service returns an error code.
         #
         putDataObject = function(sourcePath, irodsPath) {
-      
+
             irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/fileContents", irodsPath, sep="")
             authObj <- get("this")$getAuthenticationObj()
 
             res <- POST(irods_rest_url, body=list(uploadFile=upload_file(sourcePath)), authObj)
 
-            # check for error 
+            # check for error
             stop_for_status(res)
         },
 
         # Lists the contents of an iRODS collection..
         #
         # Args:
-        #  path:  The path on the iRODS collection. 
-        # 
-        # Returns: 
+        #  path:  The path on the iRODS collection.
+        #
+        # Returns:
         #   An list containing a list of dataObjects and collections.  The list is in the format:
-        #   list(dataObjects=(do1, do2, do3), collections=(coll1, coll2, coll3)) 
+        #   list(dataObjects=(do1, do2, do3), collections=(coll1, coll2, coll3))
         #
         # Exception Handling:
         #   An error is returned when the REST service returns an error code.
@@ -115,8 +115,8 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         # Example:
         #
         #   The following is an example of getting the lists of a collections and data objects, iterating
-        #   over these lists, and printing the results. 
-        #     
+        #   over these lists, and printing the results.
+        #
         #   res <- context$listCollection("/tempZone/home/rods")
         #   for (coll in res[["collections"]]) {
         #       print(coll)
@@ -124,7 +124,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         #   for (dataObj in res[[dataObjects"]]) {
         #       print(dataObj)
         #   }
-        #   
+        #
         listCollection = function(path) {
 
             irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/collection", path, "?listing=true&listType=both", sep="")
@@ -132,10 +132,10 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
 
             res <- GET(irods_rest_url, authObj, accept_xml())
 
-            #avu_list <- append(avu_list, list(list(attr=attr, val=val, unit=unit))) 
-          
+            #avu_list <- append(avu_list, list(list(attr=attr, val=val, unit=unit)))
 
-            # check for error 
+
+            # check for error
             stop_for_status(res)
 
             # Parse the xml response and build a list of collections and a list of data objects.
@@ -155,7 +155,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
             dataObjects <- list()
 
             # Now do parsing.
-            xml_data <- xmlInternalTreeParse(res) 
+            xml_data <- xmlInternalTreeParse(res)
             rootNode <- xmlChildren(xml_data)[[1]]
             children <- xmlChildren(rootNode)
             for (node in children) {
@@ -174,7 +174,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
                         if (objectType == "COLLECTION") {
                             collections <- append(collections, pathOrName)
                         } else if (objectType == "DATA_OBJECT") {
-                            dataObjects <- append(dataObjects, pathOrName) 
+                            dataObjects <- append(dataObjects, pathOrName)
                         }
                     }
                 }
@@ -190,9 +190,9 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         # Creates an iRODS collection.
         #
         # Args:
-        #  path:  The path in iRODS where the collection is to be created. 
-        # 
-        # Returns: 
+        #  path:  The path in iRODS where the collection is to be created.
+        #
+        # Returns:
         #  None
         #
         # Exception Handling:
@@ -205,18 +205,18 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
 
             res <- PUT(irods_rest_url, authObj)
 
-            # check for error 
+            # check for error
             stop_for_status(res)
 
         },
 
-        # Remove an iRODS collection.  
+        # Removes an iRODS collection.
         #
         # Args:
-        #  path:  The path in iRODS where the collection is to be removed. 
+        #  path:  The path in iRODS where the collection is to be removed.
         #  force: Indicates if the force flag is to be sent with the collection removal.
-        # 
-        # Returns: 
+        #
+        # Returns:
         #  None
         #
         # Exception Handling:
@@ -233,7 +233,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
                res <- DELETE(irods_rest_url, authObj, body=list(force = "false"))
            }
 
-           # check for error 
+           # check for error
            stop_for_status(res)
 
            #res$status_code
@@ -250,7 +250,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
 
            res <- GET(irods_rest_url, authObj, accept_xml())
 
-           # check for error 
+           # check for error
            stop_for_status(res)
 
            avu_list <- list()
@@ -279,21 +279,21 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
            avu_list
        },
 
-       # Gets the metadata for a collection.  
+       # Gets the metadata for a collection.
        #
        # Args:
-       #  path:  The path in iRODS for the collection. 
-       # 
-       # Returns: 
+       #  path:  The path in iRODS for the collection.
+       #
+       # Returns:
        #   A list of named lists representing the metadata on the collection.  The
-       #   keys of the named lists are "attr", "val", and "unit". 
+       #   keys of the named lists are "attr", "val", and "unit".
        #
        # Exception Handling:
        #   An error is returned when the REST service returns an error code.
        #
        # Example:
        #
-       # The following is an example of a call to this method and the extraction of metadata 
+       # The following is an example of a call to this method and the extraction of metadata
        # from the return value.
        #
        # meta <- context$getCollectionMetadata("/tempZone/home/rods")
@@ -307,21 +307,21 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
            get("this")$getMetadata(path, "collection")
        },
 
-       # Gets the metadata for a data object. 
+       # Gets the metadata for a data object.
        #
        # Args:
-       #  path:  The path in iRODS for the data object. 
-       # 
-       # Returns: 
+       #  path:  The path in iRODS for the data object.
+       #
+       # Returns:
        #   A list of named lists representing the metadata on the data object.  The
-       #   keys of the named lists are "attr", "val", and "unit". 
+       #   keys of the named lists are "attr", "val", and "unit".
        #
        # Exception Handling:
        #   An error is returned when the REST service returns an error code.
        #
        # Example:
        #
-       # The following is an example of a call to this method and the extraction of metadata 
+       # The following is an example of a call to this method and the extraction of metadata
        # from the return value.
        #
        # meta <- context$getDataObjectMetadata("/tempZone/home/rods/myfile.txt")
@@ -332,7 +332,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
        # }
        #
        getDataObjectMetadata = function(path) {
-           get("this")$getMetadata(path, "dataObject") 
+           get("this")$getMetadata(path, "dataObject")
        },
 
        # Method to add or delete metadata.  This is called by addCollectionMetadata(),
@@ -375,18 +375,18 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
                res <- PUT(irods_rest_url, authObj, body = xmlStr, content_type_xml())
            }
 
-           # check for error 
+           # check for error
            stop_for_status(res)
        },
 
-       # Add metadata to a data object. 
+       # Adds metadata to a data object.
        #
        # Args:
-       #  path:      The path in iRODS for the data object. 
+       #  path:      The path in iRODS for the data object.
        #  avu_list:  A list of named lists representing the metadata to be written.  The
-       #             keys of the named lists must be "attr", "val", and "unit". 
-       # 
-       # Returns: 
+       #             keys of the named lists must be "attr", "val", and "unit".
+       #
+       # Returns:
        #   None:
        #
        # Exception Handling:
@@ -408,14 +408,14 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
            get("this")$addOrDeleteMetadata(path, avu_list, "dataObject")
        },
 
-       # Delete metadata from a data object. 
+       # Deletes metadata from a data object.
        #
        # Args:
-       #  path:      The path in iRODS for the data object. 
+       #  path:      The path in iRODS for the data object.
        #  avu_list:  A list of named lists representing the metadata to be deleted.  The
-       #             keys of the named lists must be "attr", "val", and "unit". 
-       # 
-       # Returns: 
+       #             keys of the named lists must be "attr", "val", and "unit".
+       #
+       # Returns:
        #   None:
        #
        # Exception Handling:
@@ -427,14 +427,14 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
           get("this")$addOrDeleteMetadata(path, avu_list, "dataObject", TRUE)
        },
 
-       # Add metadata to a collection. 
+       # Adds metadata to a collection.
        #
        # Args:
-       #  path:      The path in iRODS for the collection. 
+       #  path:      The path in iRODS for the collection.
        #  avu_list:  A list of named lists representing the metadata to be added.  The
-       #             keys of the named lists must be "attr", "val", and "unit". 
-       # 
-       # Returns: 
+       #             keys of the named lists must be "attr", "val", and "unit".
+       #
+       # Returns:
        #   None:
        #
        # Exception Handling:
@@ -454,14 +454,14 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
            get("this")$addOrDeleteMetadata(path, avu_list, "collection")
        },
 
-       # Delete metadata from a collection. 
+       # Deletes metadata from a collection.
        #
        # Args:
-       #  path:      The path in iRODS for the collection. 
+       #  path:      The path in iRODS for the collection.
        #  avu_list:  A list of named lists representing the metadata to be deleted.  The
-       #             keys of the named lists must be "attr", "val", and "unit". 
-       # 
-       # Returns: 
+       #             keys of the named lists must be "attr", "val", and "unit".
+       #
+       # Returns:
        #   None:
        #
        # Exception Handling:

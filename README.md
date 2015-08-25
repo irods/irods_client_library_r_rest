@@ -11,12 +11,12 @@ The first steps to use the API is to import the iRODS_API.R file and create an c
     context <- IrodsContext("localhost", "8080", "rods", "rods")
 
 The arguments to the IrodsContext constructor are:
-* irods_server - the hostname or address of the iRODS server 
+* irods_server - the hostname or address of the iRODS server
 * irods_rest_api_port - the port to connect to the iRODS REST API
 * username - the iRODS user that is used for the connection to iRODS
-* password - the password for the iRODS user  
+* password - the password for the iRODS user
 
-> Note that the REST API Port is the port to connect to the REST API web service.  This is NOT the port to connect to the iCAT server. 
+> Note that the REST API Port is the port to connect to the REST API web service.  This is NOT the port to connect to the iCAT server.
 
 ## Operations and Code Samples
 
@@ -24,7 +24,7 @@ For the following operations, it is assumed that the context object has already 
 
 ### getDataObjectContents
 
-This routine gets the contents of a data object.  
+This routine gets the contents of a data object.
 
 Arguments:
 
@@ -52,7 +52,7 @@ Code Example:
 ### listCollection
 
 Lists the contents of an iRODS collection.  This routine returns a list containing a list of dataObjects and collections.  The list is in the format:
-list(dataObjects=(do1, do2, do3), collections=(coll1, coll2, coll3)) 
+list(dataObjects=(do1, do2, do3), collections=(coll1, coll2, coll3))
 
 Arguments:
 
@@ -86,7 +86,7 @@ Removes an iRODS collection.
 
 Arguments:
 
-* path - the path in iRODS of the collection to be removed 
+* path - the path in iRODS of the collection to be removed
 * force - boolean flag (defaulting to FALSE) indicating if the force flag is to be sent
 
 Code Example:
@@ -97,7 +97,7 @@ Code Example:
 
 Gets the metadata for a collection.  The return value is a list of named lists representing the metadata
 on the collection.  This list looks like the following:
-((attr=attr1, val=val1, unit=unit1), (attr=attr2, val=val2, unit=unit2), ...)  
+((attr=attr1, val=val1, unit=unit1), (attr=attr2, val=val2, unit=unit2), ...)
 
 Arguments:
 
@@ -134,12 +134,12 @@ Code Example:
 
 ### addDataObjectMetadata
 
-Add metadata to a data object.
+Adds metadata to a data object.
 
 Arguments:
 
 * path - the full path in iRODS for the data object
-* avu_list - A list of named lists representing the metadata to be written.  The keys of the named lists must be "attr", "val", and "unit". 
+* avu_list - A list of named lists representing the metadata to be written.  The keys of the named lists must be "attr", "val", and "unit".
 
 Code Example:
 
@@ -150,12 +150,12 @@ Code Example:
 
 ### deleteDataObjectMetadata
 
-Delete metadata from a data object.  
+Deletes metadata from a data object.
 
 Arguments:
 
 * path - the full path in iRODS for the data object
-* avu_list - A list of named lists representing the metadata to be deleted.  The keys of the named lists must be "attr", "val", and "unit".  
+* avu_list - A list of named lists representing the metadata to be deleted.  The keys of the named lists must be "attr", "val", and "unit".
 
 Code Example:
 
@@ -166,12 +166,12 @@ Code Example:
 
 ### addCollectionMetadata
 
-Add metadata to a collection. 
+Adds metadata to a collection.
 
 Arguments:
 
-* path - the full path in iRODS for the collection 
-* avu_list - A list of named lists representing the metadata to be added.  The keys of the named lists must be "attr", "val", and "unit". 
+* path - the full path in iRODS for the collection
+* avu_list - A list of named lists representing the metadata to be added.  The keys of the named lists must be "attr", "val", and "unit".
 
 Code Example:
 
@@ -182,7 +182,7 @@ Code Example:
 
 ### deleteCollectionMetadata
 
-Delete metadata on a collection.
+Deletes metadata on a collection.
 
 Arguments:
 
@@ -195,4 +195,3 @@ Code Example:
     avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
     avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
     context$deleteCollectionMetadata("/tempZone/home/rods", avu_list)
- 
