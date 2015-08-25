@@ -214,7 +214,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         #
         # Args:
         #  path:  The path in iRODS where the collection is to be removed. 
-        #  force: Indicates if if the force flag is to be sent with the collection removal.
+        #  force: Indicates if the force flag is to be sent with the collection removal.
         # 
         # Returns: 
         #  None
@@ -400,9 +400,9 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
        # a data object:
        #
        # avu_list <- list()
-       # avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit"))
-       # avu_list <- append(avu_list, list(list(attr="myAttr2', val="myVal2", unit="myUnit2"))
-       # context$addDataObjectMetadata("/tempZone/home/rods/ab.txt", avu_list)
+       # avu_list <- append(avu_list, list(list(attr="myAttr", val="myVal", unit="myUnit")))
+       # avu_list <- append(avu_list, list(list(attr="myAttr2", val="myVal2", unit="myUnit2")))
+       # context$addDataObjectMetadata("/tempZone/home/rods/tmp.txt", avu_list)
        #
        addDataObjectMetadata = function(path, avu_list) {
            get("this")$addOrDeleteMetadata(path, avu_list, "dataObject")
