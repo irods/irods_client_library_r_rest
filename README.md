@@ -11,7 +11,7 @@ The first steps to use the API is to import the iRODS_API.R file and create an c
     context <- IrodsContext("localhost", "8080", "rods", "rods")
 
 The arguments to the IrodsContext constructor are:
-* irods_server - the hostname or address of the iRODS server
+* irods_server - the hostname or address of the server that hosts the iRODS REST API
 * irods_rest_api_port - the port to connect to the iRODS REST API
 * username - the iRODS user that is used for the connection to iRODS
 * password - the password for the iRODS user
