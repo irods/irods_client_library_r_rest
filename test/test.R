@@ -2,7 +2,7 @@ source("../src/iRODS_API.R")
 source("config.R")
 
 context <- IrodsContext(REST_SERVER_HOST, REST_SERVER_PORT, IRODS_USER_USERNAME, IRODS_USER_PASSWORD)
-path <- paste("/", IRODS_SERVER_ZONE, "/home/", IRODS_USER_USERNAME, sep="")
+path <- paste("/", IRODS_ZONE, "/home/", IRODS_USER_USERNAME, sep="")
 test_filename_only <- "test_file_in_irods.txt"
 test_file_path <- paste(path, "/", test_filename_only, sep="")
 test_collection_path <- paste(path, "/coll1", sep="")

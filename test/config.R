@@ -1,5 +1,5 @@
 REST_SERVER_HOST <- "localhost"
 REST_SERVER_PORT <- "8080"
-IRODS_SERVER_ZONE <- "tempZone"
+IRODS_ZONE <- "tempZone"
 IRODS_USER_USERNAME <- "rods"
 IRODS_USER_PASSWORD <- "rods"
