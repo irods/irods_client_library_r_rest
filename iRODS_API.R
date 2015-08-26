@@ -26,15 +26,16 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
    .username <- username
    .password <- password
 
+   rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
+   rest_url_prefix <- paste(rest_url_prefix, "@", get(".irods_server"), ":", sep="")
+   rest_url_prefix <- paste(rest_url_prefix, get(".irods_rest_api_port"), "/irods-rest/rest", sep="")
+
     me <- list(
         thisEnv = thisEnv,
 
         # Gets the URL prefix for the REST calls.
         getRestUrlPrefix = function() {
-            rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
-            rest_url_prefix <- paste(rest_url_prefix, "@", get(".irods_server"), ":", sep="")
-            rest_url_prefix <- paste(rest_url_prefix, get(".irods_rest_api_port"), "/irods-rest/rest", sep="")
-            return(rest_url_prefix)
+            return(get("rest_url_prefix"))
         },
 
         # Gets and authentication object with the supplied username and password.

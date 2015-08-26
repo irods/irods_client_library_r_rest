@@ -60,7 +60,7 @@ Arguments:
 
 Code Example:
 
-    context$listCollection("/tempZone/home/rods")
+    res <- context$listCollection("/tempZone/home/rods")
     for (coll in res[["collections"]]) {
         print(coll)
     }
