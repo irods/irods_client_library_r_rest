@@ -33,7 +33,7 @@ Arguments:
 
 Code Example:
 
-    res <- context$getDataObjectContents("/tempZone/home/rods/a.txt, FALSE)
+    res <- context$getDataObjectContents("/tempZone/home/rods/a.txt", FALSE)
     print(res)
 
 ### putDataObject
@@ -48,6 +48,20 @@ Arguments:
 Code Example:
 
     context$putDataObject("/home/jjames/tmp.txt", "/tempZone/home/rods/tmp.txt")
+
+### removeDataObject
+
+Removes an iRODS data object.
+
+Arguments:
+
+* path - the path in iRODS of the data object to be removed
+* force - boolean flag (defaulting to FALSE) indicating if the force flag is to be sent
+
+Code Example:
+
+    context$removeDataObject("/tempZone/home/rods/tmp.txt")
+
 
 ### listCollection
 
@@ -68,7 +82,7 @@ Code Example:
         print(dataObj)
     }
 
-### putCollection
+### createCollection
 
 Creates an iRODS collection.
 
@@ -78,9 +92,9 @@ Arguments:
 
 Code Example:
 
-    context$putCollection("/tempZone/home/rods/temp")
+    context$createCollection("/tempZone/home/rods/temp")
 
-### rmCollection
+### removeCollection
 
 Removes an iRODS collection.
 
@@ -91,7 +105,7 @@ Arguments:
 
 Code Example:
 
-    context$rmCollection("/tempZone/home/rods/temp")
+    context$removeCollection("/tempZone/home/rods/temp")
 
 ### getCollectionMetadata
 

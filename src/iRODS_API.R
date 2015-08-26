@@ -26,16 +26,16 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
    .username <- username
    .password <- password
 
-   rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
-   rest_url_prefix <- paste(rest_url_prefix, "@", get(".irods_server"), ":", sep="")
-   rest_url_prefix <- paste(rest_url_prefix, get(".irods_rest_api_port"), "/irods-rest/rest", sep="")
+   .rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
+   .rest_url_prefix <- paste(.rest_url_prefix, "@", .irods_server, ":", sep="")
+   .rest_url_prefix <- paste(.rest_url_prefix, .irods_rest_api_port, "/irods-rest/rest", sep="")
 
     me <- list(
         thisEnv = thisEnv,
 
         # Gets the URL prefix for the REST calls.
         getRestUrlPrefix = function() {
-            return(get("rest_url_prefix"))
+            return(get(".rest_url_prefix"))
         },
 
         # Gets and authentication object with the supplied username and password.
@@ -63,12 +63,10 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
             irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/fileContents", path, sep="")
             authObj <- get("this")$getAuthenticationObj()
 
-            res <- GET(irods_rest_url, authObj)
+            res <- GET(URLencode(irods_rest_url), authObj)
 
             # check for error
             stop_for_status(res)
-
-            # return content
 
             if (binary == TRUE) {
                 content(res, "raw")
@@ -95,7 +93,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
             irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/fileContents", irodsPath, sep="")
             authObj <- get("this")$getAuthenticationObj()
 
-            res <- POST(irods_rest_url, body=list(uploadFile=upload_file(sourcePath)), authObj)
+            res <- POST(URLencode(irods_rest_url), body=list(uploadFile=upload_file(sourcePath)), authObj)
 
             # check for error
             stop_for_status(res)
@@ -131,9 +129,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
             irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/collection", path, "?listing=true&listType=both", sep="")
             authObj <- get("this")$getAuthenticationObj()
 
-            res <- GET(irods_rest_url, authObj, accept_xml())
-
-            #avu_list <- append(avu_list, list(list(attr=attr, val=val, unit=unit)))
+            res <- GET(URLencode(irods_rest_url), authObj, accept_xml())
 
 
             # check for error
@@ -199,12 +195,12 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         # Exception Handling:
         #   An error is returned when the REST service returns an error code.
         #
-        putCollection = function(path) {
+        createCollection = function(path) {
 
             irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/collection", path, sep="")
             authObj <- get("this")$getAuthenticationObj()
 
-            res <- PUT(irods_rest_url, authObj)
+            res <- PUT(URLencode(irods_rest_url), authObj)
 
             # check for error
             stop_for_status(res)
@@ -223,23 +219,48 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
         # Exception Handling:
         #   An error is returned when the REST service returns an error code.
         #
-        rmCollection = function(path, force = FALSE) {
+        removeCollection = function(path, force = FALSE) {
 
            irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/collection", path, sep="")
            authObj <- get("this")$getAuthenticationObj()
 
            if (force) {
-               res <- DELETE(irods_rest_url, authObj, body=list(force = "true"))
+               res <- DELETE(URLencode(irods_rest_url), authObj, body=list(force = "true"))
            } else {
-               res <- DELETE(irods_rest_url, authObj, body=list(force = "false"))
+               res <- DELETE(URLencode(irods_rest_url), authObj, body=list(force = "false"))
            }
 
            # check for error
            stop_for_status(res)
-
-           #res$status_code
-
        },
+
+        # Deletes an iRODS data object. 
+        #
+        # Args:
+        #  path:  The path in iRODS where the data object is to be removed.
+        #  force: Indicates if the force flag is to be sent with the data object removal.
+        #
+        # Returns:
+        #  None
+        #
+        # Exception Handling:
+        #   An error is returned when the REST service returns an error code.
+        #
+        removeDataObject = function(path, force = FALSE) {
+
+           irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/collection", path, sep="")
+           authObj <- get("this")$getAuthenticationObj()
+
+           if (force) {
+               res <- DELETE(URLencode(irods_rest_url), authObj, body=list(force = "true"))
+           } else {
+               res <- DELETE(URLencode(irods_rest_url), authObj, body=list(force = "false"))
+           }
+
+           # check for error
+           stop_for_status(res)
+       },
+
 
        # Method to get metadata.  This is called by getCollectionMetadata()
        # and getDataObjectMetadata().  The type should be either "collection"
@@ -249,7 +270,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
            irods_rest_url <- paste(get("this")$getRestUrlPrefix(), "/", type, path, "/metadata", sep="")
            authObj <- get("this")$getAuthenticationObj()
 
-           res <- GET(irods_rest_url, authObj, accept_xml())
+           res <- GET(URLencode(irods_rest_url), authObj, accept_xml())
 
            # check for error
            stop_for_status(res)
@@ -371,9 +392,9 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
            xmlStr <- saveXML(xml_output, prefix='<?xml version="1.0"?>\n')
 
            if (deleteFlag) {
-               res <- POST(irods_rest_url, authObj, body = xmlStr, content_type_xml())
+               res <- POST(URLencode(irods_rest_url), authObj, body = xmlStr, content_type_xml())
            } else {
-               res <- PUT(irods_rest_url, authObj, body = xmlStr, content_type_xml())
+               res <- PUT(URLencode(irods_rest_url), authObj, body = xmlStr, content_type_xml())
            }
 
            # check for error
@@ -393,7 +414,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
        # Exception Handling:
        #   An error is returned when the REST service returns an error code.
        #   An error is returned if any of the named lists in avu_list do not have
-       #     both an "attr" and a "value" named parameter.
+       #     both an "attr" and a "val" named parameter.
        #
        # Example:
        #
@@ -422,7 +443,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
        # Exception Handling:
        #   An error is returned when the REST service returns an error code.
        #   An error is returned if any of the named lists in avu_list do not have
-       #     both an "attr" and a "value" named parameter.
+       #     both an "attr" and a "val" named parameter.
        #
        deleteDataObjectMetadata = function(path, avu_list) {
           get("this")$addOrDeleteMetadata(path, avu_list, "dataObject", TRUE)
@@ -441,7 +462,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
        # Exception Handling:
        #   An error is returned when the REST service returns an error code.
        #   An error is returned if any of the named lists in avu_list do not have
-       #     both an "attr" and a "value" named parameter.
+       #     both an "attr" and a "val" named parameter.
        #
        # The following shows an example of using this method to set AVU's on
        # a data object:
@@ -468,7 +489,7 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
        # Exception Handling:
        #   An error is returned when the REST service returns an error code.
        #   An error is returned if any of the named lists in avu_list do not have
-       #     both an "attr" and a "value" named parameter.
+       #     both an "attr" and a "val" named parameter.
        #
        deleteCollectionMetadata = function(path, avu_list) {
            get("this")$addOrDeleteMetadata(path, avu_list, "collection", TRUE)
