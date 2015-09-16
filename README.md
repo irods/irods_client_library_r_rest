@@ -7,14 +7,20 @@ The R iRODS client API uses the REST API for communications with iRODS.  See [iR
 ## Including the API Code and Creating a Connection Context
 The first steps to use the API is to import the iRODS_API.R file and create an connection context object.  This is done as follows:
 
+    \# Supplying a password to IrodsContext 
     source("/path/to/source/file/iRODS_API.R")
     context <- IrodsContext("localhost", "8080", "rods", "rods")
+
+    \# Using the password that is in the local .irodsA file
+    source("/path/to/source/file/iRODS_API.R")
+    context <- IrodsContext("localhost", "8080", "rods", "rods")
+
 
 The arguments to the IrodsContext constructor are:
 * irods_server - the hostname or address of the server that hosts the iRODS REST API
 * irods_rest_api_port - the port to connect to the iRODS REST API
 * username - the iRODS user that is used for the connection to iRODS
-* password - the password for the iRODS user
+* password (optional) - the password for the iRODS user
 
 > Note that the REST API Port is the port to connect to the REST API web service.  This is NOT the port to connect to the iCAT server.
 

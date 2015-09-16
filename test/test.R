@@ -79,4 +79,10 @@ context$removeCollection(test_collection_path)
 res <- context$listCollection(path)
 stopifnot(!(test_collection_path %in% res$collections))
 
+print("Test creating context without password - using .irodsA")
+context <- IrodsContext(REST_SERVER_HOST, REST_SERVER_PORT, IRODS_USER_USERNAME)
+res <- context$listCollection(path)
+stopifnot(!(test_collection_path %in% res$collections))
+
+
 cleanup()

@@ -1,15 +1,17 @@
 library("httr")
 library(XML)
+library(bitops)
 
 # Sets up a context for a connection to the iRODS REST service..
 #
 # Args:
-#  irods_server:         The hostname or address of the iRODS server.
-#  irods_rest_api_port:  The port to connect to the iRODS REST API.
+#  irods_server:         The hostname or address of the iRODS server. 
+#  irods_rest_api_port:  The port to connect to the iRODS REST API. 
 #  username:             The iRODS user that is used for the connection to iRODS.
-#  password:             The password for the iRODS user.
-#
-# Returns:
+#  password:             (optional) The password for the iRODS user. If this is 
+#                        ommitted the password is read and decrypted from ~/.irods/.irodsA
+# 
+# Returns: 
 #    A context object that can be used to execute further interactions with iRODS.
 #
 # Example of creating and using a context.
@@ -17,14 +19,19 @@ library(XML)
 #    context <- IrodsContext("localhost", "8080", "rods", "rods")
 #    res <- context$putDataObject("/var/lib/irods/myfile.txt", "/tempZone/home/rods/myfile.txt")
 #
-IrodsContext <- function(irods_server, irods_rest_api_port, username, password) {
+IrodsContext <- function(irods_server, irods_rest_api_port, username, password = NULL) {
 
    thisEnv <- environment()
 
    .irods_server <- irods_server
    .irods_rest_api_port <- irods_rest_api_port
    .username <- username
-   .password <- password
+
+   if (is.null(password)) {
+       .password <- obfiDecode()
+   } else {
+       .password <- password
+   }
 
    .rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
    .rest_url_prefix <- paste(.rest_url_prefix, "@", .irods_server, ":", sep="")
@@ -502,4 +509,229 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password) 
     class(me) <- append(class(me), "IrodsContext")
     return(me)
 }
+
+# This method reproduces the obfiDecode() C++ routine used by the CLI clients.
+# It decrypts the password from the .irodsA file.
+obfiDecode = function() {
+
+    # Read the password file contents
+    .irodsAFile <- "~/.irods/.irodsA"
+    .in <- readChar(.irodsAFile, file.info(.irodsAFile)$size)
+
+    # Get the mtime of the password file & 0xFFFF
+    timeVal <- bitAnd(as.integer(file.info(.irodsAFile)[,"mtime"]), 0xFFFF)
+
+    # Get the user ID from password file & 0xF5F
+    uid <- bitAnd(file.info(.irodsAFile)[,"uid"], 0xF5F)
+
+
+    nout <- 0 
+    out <- '' 
+    wheel <- rep(0, times = 26 + 26 + 10 + 15)
+    headstring <- '' 
+
+    wheel_len <- 26 + 26 + 10 + 15
+    j <- 1
+    for (i in 0:9) {
+        wheel[j] = 48 + i
+        j <- j+1
+    }
+    for (i in 0:25) {
+        wheel[j] = 65 + i
+        j <- j+1
+    }
+    for (i in 0:25) {
+        wheel[j] = 97 + i
+        j <- j+1
+    }
+    for (i in 0:14) {
+        wheel[j] = 33 + i
+        j <- j+1
+    }
+
+    too_short <- 0
+    if (nchar(.in) < 7) {
+        too_short <- 1
+    }
+
+    kpos <- 6
+    i <- 6
+
+    rval <- char_n_ascii(.in, 7)
+    rval <- rval - 101 
+
+    if ( rval > 15 || rval < 0 || too_short == 1 ) { # invalid key to short 
+        stop("PASSWORD_NOT_ENCRYPTED")
+    }
+
+    seq <- 0
+    if ( rval == 0 ) {
+        seq <- 0xd768b678
+    }
+    if ( rval == 1 ) {
+        seq <- 0xedfdaf56
+    }
+    if ( rval == 2 ) {
+        seq <- 0x2420231b
+    }
+    if ( rval == 3 ) {
+        seq <- 0x987098d8
+    }
+    if ( rval == 4 ) {
+        seq <- 0xc1bdfeee
+    }
+    if ( rval == 5 ) {
+        seq <- 0xf572341f
+    }
+    if ( rval == 6 ) {
+        seq <- 0x478def3a
+    }
+    if ( rval == 7 ) {
+        seq <- 0xa830d343
+    }
+    if ( rval == 8 ) {
+        seq <- 0x774dfa2a
+    }
+    if ( rval == 9 ) {
+        seq <- 0x6720731e
+    }
+    if ( rval == 10 ) {
+        seq <- 0x346fa320
+    }
+    if ( rval == 11 ) {
+        seq <- 0x6ffdf43a
+    }
+    if ( rval == 12 ) {
+        seq <- 0x7723a320
+    }
+    if ( rval == 13 ) {
+        seq <- 0xdf67d02e
+    }
+    if ( rval == 14 ) {
+        seq <- 0x86ad240a
+    }
+    if ( rval == 15 ) {
+        seq <- 0xe76d342e
+    }
+
+    addin_i <- 0
+    my_out <- headstring
+    my_in <- substring(.in, 2)  # skip leading .
+
+    ii <- 0
+    while (1==1) { 
+        ii <- ii + 1 
+        if ( ii == 6 ) {
+            not_en <- 0
+            if ( substring(.in, 1, 1) != '.' ) {
+                not_en <- 1  # is not 'encrypted' 
+            }
+
+            # at this point my_out and headstring point to same memory location (in C) so changed headstring to my_out 
+            if ( char_n_ascii(my_out, 1) != char_to_ascii('S') - ( ( bitAnd(rval, 0x7) ) * 2 ) ) {
+                not_en <- 1
+            }
+
+            #encodedTime = ( ( headstring[1] - 'a' ) << 4 ) + ( headstring[2] - 'a' ) +
+            #       ( ( headstring[3] - 'a' ) << 12 ) + ( ( headstring[4] - 'a' ) << 8 );
+
+            # changed this from headstring to my_out because c code has my_out = headstring
+            # and these are character pointers
+            encodedTime = bitShiftL( char_n_ascii(my_out,2) - char_to_ascii('a'),  4 ) + 
+                   ( char_n_ascii(my_out,3) - char_to_ascii('a') ) +
+                   bitShiftL( ( char_n_ascii(my_out, 4) - char_to_ascii('a') ), 12 ) + 
+                   bitShiftL( ( char_n_ascii(my_out ,5) - char_to_ascii('a') ), 8  ) 
+
+            if ( obfiTimeCheck( encodedTime, timeVal ) == 1) {
+                not_en <- 1
+            }
+      
+            my_out <- out   # start outputing for real 
+            if ( not_en == 1 ) {
+                #while ( ( *out++ = *.in++ ) != '\0' ) {
+                #    ;    /* return input string */
+                #}
+                stop("PASSWORD_NOT_ENCRYPTED")
+            }
+            #my_in <- .in
+            my_in <- substring(my_in, 2)
+        } else {
+            found <- 0
+
+            addin <- bitAnd(bitShiftR(seq, addin_i), 0x1f)
+            addin <- addin + uid
+            addin_i <- addin_i + 3
+            if ( addin_i > 28 ) {
+                addin_i <- 0
+            }
+            for (i in 1:wheel_len) {
+                if ( substring(my_in, 1, 1) == ascii_to_char(wheel[i]) ) {  
+                    j <- i - addin
+                    while ( j < 0 ) {
+                        j <- j + wheel_len
+                    }
+                    my_out <- paste0(my_out, ascii_to_char(wheel[j]))
+                    nout <- nout + 1
+                    found = 1
+                    break
+                }
+            }
+            if ( found == 0 ) {
+                if ( my_in == "") {  #char_to_ascii(substring(my_in, 1, 1)) == 0 ) {
+                    return(my_out)
+                }
+                else {
+                    #*my_out++ = *my_in;
+                    my_out <- paste0(my_out, substring(my_in, 1, 1))
+                    nout <- nout + 1
+                }
+            }
+            my_in <- substring(my_in, 2)    #my_in++
+        }
+    }
+}
+
+# Returns the ASCII numeric value for the char.
+char_to_ascii <- function(char) { 
+    strtoi(charToRaw(char),16L) 
+}
+
+# Returns the ASCII numeric value for the nth character in the string, str.
+char_n_ascii <- function(str, n) { 
+    char_to_ascii(substring(str, n, n)) 
+}
+
+# Returns the character with the ascii value of n
+ascii_to_char <- function(n) { 
+    rawToChar(as.raw(n)) 
+}
+
+obfiTimeCheck <- function(time1, time2) {
+    fudge <- 20
+    delta <- time1 - time2
+    if ( delta < 0 ) {
+        delta <- 0 - delta
+    }
+    if ( delta < fudge ) {
+        return(0)
+    }
+
+    if ( time1 < 65000 ) {
+        time1 <- time1 + 65535
+    }
+    if ( time2 < 65000 ) {
+        time2 <- time2 + 65535
+    }
+
+    delta = time1 - time2
+    if ( delta < 0 ) {
+        delta <- 0 - delta
+    }
+    if ( delta < fudge ) {
+        return(0)
+    }
+
+    return(1)
+}
+
 
