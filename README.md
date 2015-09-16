@@ -7,11 +7,11 @@ The R iRODS client API uses the REST API for communications with iRODS.  See [iR
 ## Including the API Code and Creating a Connection Context
 The first steps to use the API is to import the iRODS_API.R file and create an connection context object.  This is done as follows:
 
-    \# Supplying a password to IrodsContext 
+    # Supplying a password to IrodsContext 
     source("/path/to/source/file/iRODS_API.R")
     context <- IrodsContext("localhost", "8080", "rods", "rods")
 
-    \# Using the password that is in the local .irodsA file
+    # Using the password that is in the local .irodsA file
     source("/path/to/source/file/iRODS_API.R")
     context <- IrodsContext("localhost", "8080", "rods", "rods")
 
