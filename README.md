@@ -6,7 +6,7 @@ The R iRODS client API uses the REST API for communications with iRODS.  See [iR
 
 To use the R iRODS client, the R package "httr" must also be installed.
 
-    install.package("httr")
+    install.packages("httr")
 
 ## Including the API Code and Creating a Connection Context
 The first steps to use the API is to import the iRODS_API.R file and create an connection context object.  This is done as follows:
