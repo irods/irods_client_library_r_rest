@@ -14,6 +14,11 @@ The first steps to use the API is to import the iRODS_API.R file and create an c
     # Using the password that is in the local .irodsA file
     source("/path/to/source/file/iRODS_API.R")
     context <- IrodsContext("localhost", "8080", "rods")
+ 
+    # Using a secured connection to the REST interface.
+    source("/path/to/source/file/iRODS_API.R")
+    context <- IrodsContext("localhost", "8080", "rods", "rods", ssl = TRUE)
+
 
 
 The arguments to the IrodsContext constructor are:

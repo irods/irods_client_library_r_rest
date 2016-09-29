@@ -19,7 +19,7 @@ library(bitops)
 #    context <- IrodsContext("localhost", "8080", "rods", "rods")
 #    res <- context$putDataObject("/var/lib/irods/myfile.txt", "/tempZone/home/rods/myfile.txt")
 #
-IrodsContext <- function(irods_server, irods_rest_api_port, username, password = NULL) {
+IrodsContext <- function(irods_server, irods_rest_api_port, username, password = NULL, ssl = FALSE) {
 
    thisEnv <- environment()
 
@@ -27,14 +27,20 @@ IrodsContext <- function(irods_server, irods_rest_api_port, username, password =
    .irods_rest_api_port <- irods_rest_api_port
    .username <- username
 
-   if (is.null(password)) {
+   if (is.null(password) || password == '') {
        .password <- obfiDecode()
    } else {
        .password <- password
    }
 
-   .rest_url_prefix <- paste("http://") #, get(".username"), ":", get(".password"), sep="")
-   .rest_url_prefix <- paste(.rest_url_prefix, "@", .irods_server, ":", sep="")
+   if (ssl) {
+       protocol <- "https://"
+   } else {
+       protocol <- "http://"
+   }
+
+   .rest_url_prefix <- paste(protocol) #, get(".username"), ":", get(".password"), sep="")
+   .rest_url_prefix <- paste(.rest_url_prefix, .irods_server, ":", sep="")
    .rest_url_prefix <- paste(.rest_url_prefix, .irods_rest_api_port, "/irods-rest/rest", sep="")
 
     me <- list(
