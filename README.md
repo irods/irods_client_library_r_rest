@@ -1,4 +1,4 @@
-# r-irodsclient
+# irods_client_library_r_rest
 This is an iRODS client library for the R language. It uses the iRODS REST API.
 
 ## Prerequisites
