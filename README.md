@@ -1,5 +1,5 @@
 # r-irodsclient
-This is an iRODS client API for the R language.   The client uses the iRODS REST API.
+This is an iRODS client library for the R language. It uses the iRODS REST API.
 
 ## Prerequisites
 The R iRODS client API uses the REST API for communications with iRODS.  See [iRODS REST Repository](https://github.com/DICE-UNC/irods-rest) and [iRODS REST Documentation](https://github.com/DICE-UNC/irods-rest/blob/master/docs/iRODSRESTAPIDocumentation.pdf) for setting up the REST web services.
