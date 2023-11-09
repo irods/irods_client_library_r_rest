@@ -1,3 +1,11 @@
+Note: This repository has been deprecated and archived.
+
+Please find a new pure-R implementation at:
+
+https://github.com/irods/irods_client_library_rirods
+
+----
+
 # irods_client_library_r_rest
 This is an iRODS client library for the R language. It uses the iRODS REST API.
 
